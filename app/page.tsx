@@ -13,6 +13,8 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [detectedHoursAgo, setDetectedHoursAgo] = useState<number | null>(null);
 
+  const isPremiumUser = true;
+
   const emergingTrends = [
     { name: "Quantum Computing Breakthroughs", category: "Technology" },
     { name: "Sustainable Fashion Movement", category: "Lifestyle" },
@@ -53,7 +55,7 @@ export default function Home() {
         const selectedStrength = strengths[Math.floor(Math.random() * 7)];
         const selectedStatus = statuses[Math.floor(Math.random() * 3)];
         const template = shareableTemplates[Math.floor(Math.random() * shareableTemplates.length)];
-        const hoursAgo = isLoggedIn 
+        const hoursAgo = isPremiumUser 
           ? Math.floor(Math.random() * (4 - 1 + 1)) + 1
           : Math.floor(Math.random() * (24 - 12 + 1)) + 12;
         setTrendStrength(selectedStrength);
@@ -80,18 +82,18 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div className="flex flex-col items-center gap-8 text-center sm:items-start sm:text-left w-full">
+      <main className="flex min-h-screen w-full max-w-6xl flex-col items-center justify-start py-16 px-8 bg-white dark:bg-black sm:px-16">
+        <div className="flex flex-col gap-8 w-full">
           <div className="flex flex-col gap-3 w-full">
             <div className="flex items-center justify-between w-full">
               <div className="flex flex-col gap-3">
                 <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-          Trend Project
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
+                  Trend Project
+                </h1>
+                <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
                   A universal trend-prediction engine for the internet
-          </p>
-        </div>
+                </p>
+              </div>
               <div className="flex gap-3">
                 <a
                   href="/login"
@@ -108,60 +110,60 @@ export default function Home() {
               </div>
             </div>
           </div>
-          
-          <div className="flex flex-col gap-3 w-full max-w-md">
-            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            🔍 Search Topics
-            </label>
-            <input
-              className="w-full px-4 py-3 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
-              placeholder="Enter a topic (e.g. AI, fitness, crypto)"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-          </div>
 
-          <div className="flex flex-col gap-4 w-full max-w-md mt-4">
-            <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
-              Latest Emerging Trends
-            </h2>
-            <div className="flex flex-col gap-3">
-              {emergingTrends.map((trend, index) => {
-                const hoursAgo = isLoggedIn 
-                  ? (index % 4) + 1
-                  : (index % 13) + 12;
-                return (
-                  <div key={index} className="flex flex-col gap-2 p-4 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-sm font-semibold text-black dark:text-zinc-50">
-                          {trend.name}
-                        </span>
-                        <span className="text-xs text-zinc-600 dark:text-zinc-400">
-                          {trend.category}
-                        </span>
+          <div className="flex flex-col lg:flex-row gap-8 w-full items-start">
+            <div className="flex flex-col gap-4 w-full lg:w-1/2 order-1">
+              <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
+                Latest Emerging Trends
+              </h2>
+              <div className="flex flex-col gap-3">
+                {emergingTrends.map((trend, index) => {
+                  const hoursAgo = isPremiumUser 
+                    ? (index % 4) + 1
+                    : (index % 13) + 12;
+                  return (
+                    <div key={index} className="flex flex-col gap-2 p-4 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                      <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-sm font-semibold text-black dark:text-zinc-50">
+                            {trend.name}
+                          </span>
+                          <span className="text-xs text-zinc-600 dark:text-zinc-400">
+                            {trend.category}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1 pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                        <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                          Detected {hoursAgo} {hoursAgo === 1 ? "hour" : "hours"} ago
+                        </p>
+                        {!isPremiumUser && (
+                          <p className="text-xs text-zinc-500 dark:text-zinc-500">
+                            🔒 Premium users were notified earlier
+                          </p>
+                        )}
                       </div>
                     </div>
-                    <div className="flex flex-col gap-1 pt-2 border-t border-zinc-200 dark:border-zinc-700">
-                      <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                        Detected {hoursAgo} {hoursAgo === 1 ? "hour" : "hours"} ago
-                      </p>
-                      {!isLoggedIn && (
-                        <p className="text-xs text-zinc-500 dark:text-zinc-500">
-                          🔒 Premium users were notified earlier
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          {text && (
+            <div className="flex flex-col gap-3 w-full lg:w-1/2 order-2">
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                🔍 Search Topics
+              </label>
+              <input
+                className="w-full px-4 py-3 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+                placeholder="Enter a topic (e.g. AI, fitness, crypto)"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+              />
+
+              {text && (
             <>
               {loading ? (
-                <div className="flex flex-col gap-3 w-full max-w-md mt-2 p-6 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                <div className="flex flex-col gap-3 w-full mt-4 p-6 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
                   <p className="text-base text-zinc-600 dark:text-zinc-400">
                     Analyzing trends...👀
                   </p>
@@ -169,8 +171,8 @@ export default function Home() {
               ) : (
                 <>
                   {trendStrength && trendStatus && (
-                    <div className="flex flex-col gap-5 w-full max-w-md mt-2">
-                      {!isLoggedIn ? (
+                    <div className="flex flex-col gap-5 w-full mt-4">
+                      {!isPremiumUser ? (
                         <div className="flex flex-col gap-4 p-6 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 opacity-50">
                           <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
                             Trend Summary
@@ -234,7 +236,7 @@ export default function Home() {
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400">
                                   Detected {detectedHoursAgo} {detectedHoursAgo === 1 ? "hour" : "hours"} ago
                                 </p>
-                                {!isLoggedIn && (
+                                {!isPremiumUser && (
                                   <p className="text-xs text-zinc-500 dark:text-zinc-500">
                                     🔒 Premium users were notified earlier
                                   </p>
@@ -245,7 +247,7 @@ export default function Home() {
                         </div>
                       )}
 
-                      {isLoggedIn && insight && (
+                      {isPremiumUser && insight && (
                         <div className="flex flex-col gap-2 p-5 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
                           <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
                             Why this matters
@@ -256,7 +258,7 @@ export default function Home() {
                         </div>
                       )}
 
-                      {isLoggedIn && shareableInsight && (
+                      {isPremiumUser && shareableInsight && (
                         <div className="flex flex-col gap-3 p-5 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
                           <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
                             Shareable Insight
@@ -284,6 +286,8 @@ export default function Home() {
               )}
             </>
           )}
+            </div>
+          </div>
         </div>
       </main>
     </div>
