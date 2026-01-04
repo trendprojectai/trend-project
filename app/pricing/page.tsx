@@ -1,5 +1,6 @@
 "use client";
 
+// TODO: replace with real data source
 export default function Pricing() {
   const tiers = [
     {
@@ -38,16 +39,25 @@ export default function Pricing() {
     },
   ];
 
+  const comparisonFeatures = [
+    { feature: "Trend searches", free: "Limited", starter: "More", pro: "Unlimited", premium: "Unlimited" },
+    { feature: "Update frequency", free: "Daily", starter: "Every 6h", pro: "Real-time", premium: "Real-time" },
+    { feature: "Confidence scores", free: "Blurred", starter: "Visible", pro: "Full breakdown", premium: "Full breakdown" },
+    { feature: "Growth charts", free: "Blurred", starter: "Visible", pro: "Full analysis", premium: "Full analysis" },
+    { feature: "Watchlist", free: "1 trend", starter: "5 trends", pro: "Unlimited", premium: "Unlimited" },
+    { feature: "Early access", free: "12–24h delay", starter: "6–12h delay", pro: "1–4h early", premium: "1–4h early" },
+  ];
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex w-full max-w-6xl flex-col items-center justify-center px-8 py-16">
         <div className="flex w-full flex-col gap-12">
           <div className="flex flex-col gap-3 text-center">
             <h1 className="text-3xl font-semibold leading-tight tracking-tight text-black dark:text-zinc-50">
-              Choose your plan
+              Pricing
             </h1>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Most users upgrade after missing 2 trends
+              Value comparison and upgrade clarity
             </p>
           </div>
 
@@ -101,6 +111,41 @@ export default function Pricing() {
                 </button>
               </div>
             ))}
+          </div>
+
+          <div className="flex flex-col gap-4 pt-8 border-t border-zinc-200 dark:border-zinc-800">
+            <h2 className="text-xl font-semibold text-black dark:text-zinc-50 text-center">
+              Feature Comparison
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-zinc-700 dark:text-zinc-300">Feature</th>
+                    <th className="text-center py-3 px-4 text-sm font-medium text-zinc-700 dark:text-zinc-300">Free</th>
+                    <th className="text-center py-3 px-4 text-sm font-medium text-zinc-700 dark:text-zinc-300">Starter</th>
+                    <th className="text-center py-3 px-4 text-sm font-medium text-zinc-700 dark:text-zinc-300">Pro</th>
+                    <th className="text-center py-3 px-4 text-sm font-medium text-zinc-700 dark:text-zinc-300">Premium</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparisonFeatures.map((item, index) => (
+                    <tr key={index} className="border-b border-zinc-100 dark:border-zinc-900">
+                      <td className="py-3 px-4 text-sm text-zinc-700 dark:text-zinc-300">{item.feature}</td>
+                      <td className="py-3 px-4 text-sm text-center text-zinc-600 dark:text-zinc-400">{item.free}</td>
+                      <td className="py-3 px-4 text-sm text-center text-zinc-600 dark:text-zinc-400">{item.starter}</td>
+                      <td className="py-3 px-4 text-sm text-center font-medium text-black dark:text-zinc-50">{item.pro}</td>
+                      <td className="py-3 px-4 text-sm text-center text-zinc-600 dark:text-zinc-400">{item.premium}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex flex-col gap-2 pt-4 text-center">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                Cancel anytime • No payment required today
+              </p>
+            </div>
           </div>
         </div>
       </main>
