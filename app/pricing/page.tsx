@@ -4,43 +4,36 @@ export default function Pricing() {
   const tiers = [
     {
       name: "Free",
-      description: "Basic trend preview",
-      features: [
-        "Basic trend preview",
-        "Limited searches",
-        "Delayed results",
-      ],
+      price: "£0",
+      period: "/ month",
+      headline: "See trends after momentum has already formed",
+      description: "Delayed and limited access",
       buttonText: "Get Started",
     },
     {
       name: "Starter",
-      description: "More searches and faster previews",
-      features: [
-        "More searches",
-        "Faster previews",
-        "Trend strength + confidence",
-      ],
+      price: "£9",
+      period: "/ month",
+      headline: "Be early, consistently",
+      description: "Early visibility and faster refresh",
       buttonText: "Upgrade",
     },
     {
       name: "Pro",
-      description: "Full analysis and priority updates",
-      features: [
-        "Unlimited searches",
-        "Full trend analysis",
-        "Priority updates",
-      ],
+      price: "£29",
+      period: "/ month",
+      headline: "Built for people who profit from being first",
+      description: "Full confidence, acceleration, and reasoning",
       buttonText: "Upgrade",
       highlighted: true,
+      badge: "Most Popular",
     },
     {
       name: "Premium",
-      description: "Everything unlocked with early access",
-      features: [
-        "Everything unlocked",
-        "Early trend alerts (fake)",
-        "Access to future features",
-      ],
+      price: "£79",
+      period: "/ month",
+      headline: "See trends before breakout",
+      description: "Elite access for serious users",
       buttonText: "Upgrade",
     },
   ];
@@ -53,6 +46,9 @@ export default function Pricing() {
             <h1 className="text-3xl font-semibold leading-tight tracking-tight text-black dark:text-zinc-50">
               Choose your plan
             </h1>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              Most users upgrade after missing 2 trends
+            </p>
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -65,31 +61,34 @@ export default function Pricing() {
                     : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
                 }`}
               >
-                {tier.highlighted && (
+                {tier.badge && (
                   <div className="text-xs font-medium text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">
-                    Best Value
+                    {tier.badge}
                   </div>
                 )}
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
-                    {tier.name}
-                  </h2>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                    {tier.description}
-                  </p>
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-1">
+                    <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
+                      {tier.name}
+                    </h2>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-bold text-black dark:text-zinc-50">
+                        {tier.price}
+                      </span>
+                      <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                        {tier.period}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm font-medium text-black dark:text-zinc-50">
+                      {tier.headline}
+                    </p>
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                      {tier.description}
+                    </p>
+                  </div>
                 </div>
-
-                <ul className="flex flex-col gap-2">
-                  {tier.features.map((feature, index) => (
-                    <li
-                      key={index}
-                      className="flex items-start gap-2 text-sm text-zinc-700 dark:text-zinc-300"
-                    >
-                      <span className="mt-1">•</span>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
 
                 <button
                   className={`mt-auto w-full px-4 py-3 rounded-lg font-medium transition-colors ${
@@ -108,4 +107,3 @@ export default function Pricing() {
     </div>
   );
 }
-

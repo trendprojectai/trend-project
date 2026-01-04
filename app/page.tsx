@@ -5,6 +5,7 @@ export default function Home() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isPremiumDev, setIsPremiumDev] = useState(false);
   const [trendStrength, setTrendStrength] = useState<"Very Very Low" | "Very Low" | "Low" | "Moderate" | "High" | "Very High" | "Exploding" | null>(null);
   const [confidenceScore, setConfidenceScore] = useState<number | null>(null);
   const [trendStatus, setTrendStatus] = useState<"Rising" | "Peaking" | "Declining" | null>(null);
@@ -12,8 +13,8 @@ export default function Home() {
   const [shareableInsight, setShareableInsight] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [detectedHoursAgo, setDetectedHoursAgo] = useState<number | null>(null);
-
-  const isPremiumUser = true;
+  const [accelerationRating, setAccelerationRating] = useState<"Slow" | "Rising" | "Exploding" | null>(null);
+  const [breakoutWindow, setBreakoutWindow] = useState<string | null>(null);
 
   const emergingTrends = [
     { name: "Quantum Computing Breakthroughs", category: "Technology" },
@@ -52,15 +53,20 @@ export default function Home() {
       const timer = setTimeout(() => {
         const strengths: ("Very Very Low" | "Very Low" | "Low" | "Moderate" | "High" | "Very High" | "Exploding")[] = ["Very Very Low", "Very Low", "Low", "Moderate", "High", "Very High", "Exploding"];
         const statuses: ("Rising" | "Peaking" | "Declining")[] = ["Rising", "Peaking", "Declining"];
+        const accelerations: ("Slow" | "Rising" | "Exploding")[] = ["Slow", "Rising", "Exploding"];
         const selectedStrength = strengths[Math.floor(Math.random() * 7)];
         const selectedStatus = statuses[Math.floor(Math.random() * 3)];
+        const selectedAcceleration = accelerations[Math.floor(Math.random() * 3)];
         const template = shareableTemplates[Math.floor(Math.random() * shareableTemplates.length)];
-        const hoursAgo = isPremiumUser 
+        const hoursAgo = isPremiumDev 
           ? Math.floor(Math.random() * (4 - 1 + 1)) + 1
           : Math.floor(Math.random() * (24 - 12 + 1)) + 12;
+        const windows = ["2–5 days", "3–7 days", "5–10 days", "1–2 weeks"];
         setTrendStrength(selectedStrength);
         setConfidenceScore(Math.floor(Math.random() * (90 - 55 + 1)) + 55);
         setTrendStatus(selectedStatus);
+        setAccelerationRating(selectedAcceleration);
+        setBreakoutWindow(windows[Math.floor(Math.random() * windows.length)]);
         setInsight(insights[Math.floor(Math.random() * insights.length)]);
         setShareableInsight(template.replace("{topic}", text));
         setDetectedHoursAgo(hoursAgo);
@@ -73,12 +79,34 @@ export default function Home() {
       setTrendStrength(null);
       setConfidenceScore(null);
       setTrendStatus(null);
+      setAccelerationRating(null);
+      setBreakoutWindow(null);
       setInsight(null);
       setShareableInsight(null);
       setDetectedHoursAgo(null);
       setCopied(false);
     }
-  }, [text]);
+  }, [text, isPremiumDev]);
+
+  const getTrendStrengthEmoji = (strength: typeof trendStrength) => {
+    if (!strength) return "";
+    const emojis: Record<typeof strength, string> = {
+      "Very Very Low": "🔻🔻🔻",
+      "Very Low": "🔻🔻",
+      "Low": "🔻",
+      "Moderate": "🟡",
+      "High": "🟢",
+      "Very High": "🟢🟢",
+      "Exploding": "🚀🟢🟢",
+    };
+    return emojis[strength];
+  };
+
+  const getNotificationTime = (hoursAgo: number) => {
+    const now = new Date();
+    const notificationTime = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000);
+    return notificationTime.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -94,7 +122,24 @@ export default function Home() {
                   A universal trend-prediction engine for the internet
                 </p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-300 dark:border-zinc-700">
+                  <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer">
+                    DEV: Premium
+                  </label>
+                  <input
+                    type="checkbox"
+                    checked={isPremiumDev}
+                    onChange={(e) => setIsPremiumDev(e.target.checked)}
+                    className="w-4 h-4 cursor-pointer"
+                  />
+                </div>
+                <a
+                  href="/"
+                  className="px-4 py-2 text-sm font-medium text-black dark:text-zinc-50 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg border border-zinc-300 dark:border-zinc-700 transition-colors"
+                >
+                  Dashboard
+                </a>
                 <a
                   href="/login"
                   className="px-4 py-2 text-sm font-medium text-black dark:text-zinc-50 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg border border-zinc-300 dark:border-zinc-700 transition-colors"
@@ -111,16 +156,17 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8 w-full items-start">
-            <div className="flex flex-col gap-4 w-full lg:w-1/2 order-1">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full items-start">
+            <div className="flex flex-col gap-4 w-full">
               <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
                 Latest Emerging Trends
               </h2>
               <div className="flex flex-col gap-3">
                 {emergingTrends.map((trend, index) => {
-                  const hoursAgo = isPremiumUser 
+                  const hoursAgo = isPremiumDev 
                     ? (index % 4) + 1
                     : (index % 13) + 12;
+                  const notificationTime = getNotificationTime(hoursAgo);
                   return (
                     <div key={index} className="flex flex-col gap-2 p-4 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
                       <div className="flex items-center justify-between">
@@ -134,12 +180,18 @@ export default function Home() {
                         </div>
                       </div>
                       <div className="flex flex-col gap-1 pt-2 border-t border-zinc-200 dark:border-zinc-700">
-                        <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                          Detected {hoursAgo} {hoursAgo === 1 ? "hour" : "hours"} ago
-                        </p>
-                        {!isPremiumUser && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-zinc-600 dark:text-zinc-400">
+                            Detected {hoursAgo} {hoursAgo === 1 ? "hour" : "hours"} ago 🔒
+                          </span>
+                        </div>
+                        {!isPremiumDev ? (
                           <p className="text-xs text-zinc-500 dark:text-zinc-500">
-                            🔒 Premium users were notified earlier
+                            Premium users were notified earlier
+                          </p>
+                        ) : (
+                          <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                            Premium users were notified at {notificationTime}
                           </p>
                         )}
                       </div>
@@ -149,7 +201,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 w-full lg:w-1/2 order-2">
+            <div className="flex flex-col gap-3 w-full">
               <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 🔍 Search Topics
               </label>
@@ -161,131 +213,219 @@ export default function Home() {
               />
 
               {text && (
-            <>
-              {loading ? (
-                <div className="flex flex-col gap-3 w-full mt-4 p-6 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                  <p className="text-base text-zinc-600 dark:text-zinc-400">
-                    Analyzing trends...👀
-                  </p>
-                </div>
-              ) : (
                 <>
-                  {trendStrength && trendStatus && (
-                    <div className="flex flex-col gap-5 w-full mt-4">
-                      {!isPremiumUser ? (
-                        <div className="flex flex-col gap-4 p-6 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 opacity-50">
-                          <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
-                            Trend Summary
-                          </h2>
-                          <div className="flex items-center justify-center py-8 border-t border-zinc-200 dark:border-zinc-700">
-                            <p className="text-base text-zinc-600 dark:text-zinc-400">
-                              🔒 Upgrade to unlock full trend analysis
-                            </p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col gap-4 p-6 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                          <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
-                            Trend Summary
-                          </h2>
-                          <div className="flex flex-col gap-3">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Topic:</span>
-                              <span className="text-sm font-semibold text-black dark:text-zinc-50">{text}</span>
-                            </div>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Trend Strength:</span>
-                              <span className="text-sm font-semibold text-black dark:text-zinc-50">{trendStrength}</span>
-                              <span className="text-sm">
-                                {trendStrength === "Very Very Low" && "🔻 🔻 🔻"}
-                                {trendStrength === "Very Low" && "🔻 🔻"}
-                                {trendStrength === "Low" && "🔻"}
-                                {trendStrength === "Moderate" && "🟡"}
-                                {trendStrength === "High" && "🟢"}
-                                {trendStrength === "Very High" && "🟢 🟢"}
-                                {trendStrength === "Exploding" && "🟢 🟢 🟢"}
-                              </span>
-                              {(trendStrength === "Exploding" || trendStrength === "Very High") && (
-                                <span className="text-xs px-2 py-1 bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 rounded border border-orange-200 dark:border-orange-800">
-                                  🔥 Spiking
-                                </span>
-                              )}
-                              {(trendStrength === "Very Very Low" || trendStrength === "Very Low") && (
-                                <span className="text-xs px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 rounded border border-blue-200 dark:border-blue-800">
-                                  📉 Cooling
-                                </span>
-                              )}
-                            </div>
-                            {confidenceScore !== null && (
+                  {loading ? (
+                    <div className="flex flex-col gap-3 w-full mt-4 p-6 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                      <p className="text-base text-zinc-600 dark:text-zinc-400">
+                        Analyzing trends...👀
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      {trendStrength && trendStatus && (
+                        <div className="flex flex-col gap-5 w-full mt-4">
+                          <div className="flex flex-col gap-4 p-6 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                            <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
+                              Trend Summary
+                            </h2>
+                            <div className="flex flex-col gap-3">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Confidence:</span>
-                                <span className="text-sm font-semibold text-black dark:text-zinc-50">{confidenceScore}%</span>
+                                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Topic:</span>
+                                <span className="text-sm font-semibold text-black dark:text-zinc-50">{text}</span>
                               </div>
-                            )}
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Trend Status:</span>
-                              <span className="text-sm font-semibold text-black dark:text-zinc-50">{trendStatus}</span>
-                            </div>
-                            <p className="text-sm text-zinc-600 dark:text-zinc-400 italic pt-2 border-t border-zinc-200 dark:border-zinc-700">
-                              {trendStatus === "Rising" && "Early signals show accelerating interest across platforms."}
-                              {trendStatus === "Peaking" && "Interest is high but may be nearing saturation."}
-                              {trendStatus === "Declining" && "Signals suggest interest may be cooling."}
-                            </p>
-                            {detectedHoursAgo !== null && (
-                              <div className="flex flex-col gap-1 pt-2 border-t border-zinc-200 dark:border-zinc-700">
-                                <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                                  Detected {detectedHoursAgo} {detectedHoursAgo === 1 ? "hour" : "hours"} ago
-                                </p>
-                                {!isPremiumUser && (
-                                  <p className="text-xs text-zinc-500 dark:text-zinc-500">
-                                    🔒 Premium users were notified earlier
-                                  </p>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Trend Strength:</span>
+                                {isPremiumDev ? (
+                                  <>
+                                    <span className="text-sm font-semibold text-black dark:text-zinc-50">{trendStrength}</span>
+                                    <span className="text-sm">{getTrendStrengthEmoji(trendStrength)}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="text-sm font-semibold text-black dark:text-zinc-50 blur-sm">{trendStrength}</span>
+                                    <span className="text-sm blur-sm">{getTrendStrengthEmoji(trendStrength)}</span>
+                                  </>
+                                )}
+                                {(trendStrength === "Exploding" || trendStrength === "Very High") && isPremiumDev && (
+                                  <span className="text-xs px-2 py-1 bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 rounded border border-orange-200 dark:border-orange-800">
+                                    🔥 Spiking
+                                  </span>
+                                )}
+                                {(trendStrength === "Very Very Low" || trendStrength === "Very Low") && isPremiumDev && (
+                                  <span className="text-xs px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 rounded border border-blue-200 dark:border-blue-800">
+                                    📉 Cooling
+                                  </span>
                                 )}
                               </div>
+                              {confidenceScore !== null && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Confidence:</span>
+                                  {isPremiumDev ? (
+                                    <span className="text-sm font-semibold text-black dark:text-zinc-50">{confidenceScore}%</span>
+                                  ) : (
+                                    <span className="text-sm font-semibold text-black dark:text-zinc-50 blur-sm">{confidenceScore}%</span>
+                                  )}
+                                </div>
+                              )}
+                              {accelerationRating && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Acceleration:</span>
+                                  {isPremiumDev ? (
+                                    <span className="text-sm font-semibold text-black dark:text-zinc-50">{accelerationRating}</span>
+                                  ) : (
+                                    <span className="text-sm font-semibold text-black dark:text-zinc-50 blur-sm">{accelerationRating}</span>
+                                  )}
+                                </div>
+                              )}
+                              {breakoutWindow && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Breakout Window:</span>
+                                  {isPremiumDev ? (
+                                    <span className="text-sm font-semibold text-black dark:text-zinc-50">{breakoutWindow}</span>
+                                  ) : (
+                                    <span className="text-sm font-semibold text-black dark:text-zinc-50 blur-sm">{breakoutWindow}</span>
+                                  )}
+                                </div>
+                              )}
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Trend Status:</span>
+                                <span className="text-sm font-semibold text-black dark:text-zinc-50">{trendStatus}</span>
+                              </div>
+                              <p className="text-sm text-zinc-600 dark:text-zinc-400 italic pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                                {trendStatus === "Rising" && "Early signals show accelerating interest across platforms."}
+                                {trendStatus === "Peaking" && "Interest is high but may be nearing saturation."}
+                                {trendStatus === "Declining" && "Signals suggest interest may be cooling."}
+                              </p>
+                              {detectedHoursAgo !== null && (
+                                <div className="flex flex-col gap-1 pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                      Detected {detectedHoursAgo} {detectedHoursAgo === 1 ? "hour" : "hours"} ago 🔒
+                                    </p>
+                                  </div>
+                                  {!isPremiumDev ? (
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-500">
+                                      Premium users were notified earlier
+                                    </p>
+                                  ) : (
+                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                      Premium users were notified at {getNotificationTime(detectedHoursAgo)}
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                            {isPremiumDev && (
+                              <div className="flex flex-col gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+                                <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
+                                  Trend Growth
+                                </h3>
+                                <div className="relative h-32 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">
+                                  <svg className="w-full h-full" viewBox="0 0 200 100" preserveAspectRatio="none">
+                                    <line x1="20" y1="80" x2="180" y2="20" stroke="#ef4444" strokeWidth="2" />
+                                    <line x1="180" y1="20" x2="200" y2="10" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 4" />
+                                    <line x1="60" y1="0" x2="60" y2="100" stroke="#22c55e" strokeWidth="2" strokeDasharray="2 2" />
+                                    <text x="62" y="95" fontSize="8" fill="#22c55e">Entry Point</text>
+                                    <circle cx="60" cy="65" r="3" fill="#22c55e" />
+                                  </svg>
+                                  <div className="absolute bottom-2 left-4 text-xs text-zinc-500 dark:text-zinc-400">
+                                    Premium users entered here
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {!isPremiumDev && (
+                              <div className="flex flex-col gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+                                <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
+                                  Trend Growth
+                                </h3>
+                                <div className="relative h-32 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4 blur-sm">
+                                  <svg className="w-full h-full" viewBox="0 0 200 100" preserveAspectRatio="none">
+                                    <line x1="20" y1="80" x2="180" y2="20" stroke="#ef4444" strokeWidth="2" />
+                                    <line x1="180" y1="20" x2="200" y2="10" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 4" />
+                                  </svg>
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="flex flex-col gap-2 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+                              {isPremiumDev ? (
+                                <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                  Next update in 2m 14s
+                                </p>
+                              ) : (
+                                <>
+                                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                    Next update in 23h 12m
+                                  </p>
+                                  <p className="text-xs text-zinc-500 dark:text-zinc-500">
+                                    Upgrade to refresh now
+                                  </p>
+                                </>
+                              )}
+                            </div>
+
+                            {isPremiumDev && (
+                              <div className="flex flex-col gap-2 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+                                <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
+                                  History
+                                </h3>
+                                <div className="flex flex-col gap-1">
+                                  <p className="text-xs text-zinc-600 dark:text-zinc-400">✅ You caught this early</p>
+                                  <p className="text-xs text-zinc-600 dark:text-zinc-400">🚀 This trend went mainstream</p>
+                                </div>
+                              </div>
+                            )}
+                            {!isPremiumDev && (
+                              <div className="flex flex-col gap-2 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+                                <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
+                                  History
+                                </h3>
+                                <p className="text-xs text-zinc-500 dark:text-zinc-500">❌ This trend peaked before you saw it</p>
+                              </div>
                             )}
                           </div>
-                        </div>
-                      )}
 
-                      {isPremiumUser && insight && (
-                        <div className="flex flex-col gap-2 p-5 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                          <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
-                            Why this matters
-                          </h3>
-                          <p className="text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-                            {insight}
-                          </p>
-                        </div>
-                      )}
+                          {isPremiumDev && insight && (
+                            <div className="flex flex-col gap-2 p-5 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                              <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
+                                Why this matters
+                              </h3>
+                              <p className="text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+                                {insight}
+                              </p>
+                            </div>
+                          )}
 
-                      {isPremiumUser && shareableInsight && (
-                        <div className="flex flex-col gap-3 p-5 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                          <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
-                            Shareable Insight
-                          </h3>
-                          <p className="text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-                            {shareableInsight}
-                          </p>
-                          <button
-                            onClick={async () => {
-                              if (shareableInsight) {
-                                await navigator.clipboard.writeText(shareableInsight);
-                                setCopied(true);
-                                setTimeout(() => setCopied(false), 2000);
-                              }
-                            }}
-                            className="self-start px-4 py-2 text-sm font-medium text-black dark:text-zinc-50 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg border border-zinc-300 dark:border-zinc-700 transition-colors"
-                          >
-                            {copied ? "Copied ✓" : "Copy Insight"}
-                          </button>
+                          {isPremiumDev && shareableInsight && (
+                            <div className="flex flex-col gap-3 p-5 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                              <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
+                                Shareable Insight
+                              </h3>
+                              <p className="text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+                                {shareableInsight}
+                              </p>
+                              <button
+                                onClick={async () => {
+                                  if (shareableInsight) {
+                                    await navigator.clipboard.writeText(shareableInsight);
+                                    setCopied(true);
+                                    setTimeout(() => setCopied(false), 2000);
+                                  }
+                                }}
+                                className="self-start px-4 py-2 text-sm font-medium text-black dark:text-zinc-50 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg border border-zinc-300 dark:border-zinc-700 transition-colors"
+                              >
+                                {copied ? "Copied ✓" : "Copy Insight"}
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </div>
+                    </>
                   )}
                 </>
               )}
-            </>
-          )}
             </div>
           </div>
         </div>
