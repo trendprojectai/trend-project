@@ -11,6 +11,15 @@ export default function Home() {
   const [insight, setInsight] = useState<string | null>(null);
   const [shareableInsight, setShareableInsight] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [detectedHoursAgo, setDetectedHoursAgo] = useState<number | null>(null);
+
+  const emergingTrends = [
+    { name: "Quantum Computing Breakthroughs", category: "Technology" },
+    { name: "Sustainable Fashion Movement", category: "Lifestyle" },
+    { name: "Decentralized Social Networks", category: "Tech" },
+    { name: "Plant-Based Nutrition Focus", category: "Health" },
+    { name: "Remote Work Tools Evolution", category: "Business" },
+  ];
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -44,11 +53,15 @@ export default function Home() {
         const selectedStrength = strengths[Math.floor(Math.random() * 7)];
         const selectedStatus = statuses[Math.floor(Math.random() * 3)];
         const template = shareableTemplates[Math.floor(Math.random() * shareableTemplates.length)];
+        const hoursAgo = isLoggedIn 
+          ? Math.floor(Math.random() * (4 - 1 + 1)) + 1
+          : Math.floor(Math.random() * (24 - 12 + 1)) + 12;
         setTrendStrength(selectedStrength);
         setConfidenceScore(Math.floor(Math.random() * (90 - 55 + 1)) + 55);
         setTrendStatus(selectedStatus);
         setInsight(insights[Math.floor(Math.random() * insights.length)]);
         setShareableInsight(template.replace("{topic}", text));
+        setDetectedHoursAgo(hoursAgo);
         setCopied(false);
         setLoading(false);
       }, 800);
@@ -60,6 +73,7 @@ export default function Home() {
       setTrendStatus(null);
       setInsight(null);
       setShareableInsight(null);
+      setDetectedHoursAgo(null);
       setCopied(false);
     }
   }, [text]);
@@ -105,6 +119,43 @@ export default function Home() {
               value={text}
               onChange={(e) => setText(e.target.value)}
             />
+          </div>
+
+          <div className="flex flex-col gap-4 w-full max-w-md mt-4">
+            <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
+              Latest Emerging Trends
+            </h2>
+            <div className="flex flex-col gap-3">
+              {emergingTrends.map((trend, index) => {
+                const hoursAgo = isLoggedIn 
+                  ? (index % 4) + 1
+                  : (index % 13) + 12;
+                return (
+                  <div key={index} className="flex flex-col gap-2 p-4 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm font-semibold text-black dark:text-zinc-50">
+                          {trend.name}
+                        </span>
+                        <span className="text-xs text-zinc-600 dark:text-zinc-400">
+                          {trend.category}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1 pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                      <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                        Detected {hoursAgo} {hoursAgo === 1 ? "hour" : "hours"} ago
+                      </p>
+                      {!isLoggedIn && (
+                        <p className="text-xs text-zinc-500 dark:text-zinc-500">
+                          🔒 Premium users were notified earlier
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {text && (
@@ -178,6 +229,18 @@ export default function Home() {
                               {trendStatus === "Peaking" && "Interest is high but may be nearing saturation."}
                               {trendStatus === "Declining" && "Signals suggest interest may be cooling."}
                             </p>
+                            {detectedHoursAgo !== null && (
+                              <div className="flex flex-col gap-1 pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                                <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                  Detected {detectedHoursAgo} {detectedHoursAgo === 1 ? "hour" : "hours"} ago
+                                </p>
+                                {!isLoggedIn && (
+                                  <p className="text-xs text-zinc-500 dark:text-zinc-500">
+                                    🔒 Premium users were notified earlier
+                                  </p>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
