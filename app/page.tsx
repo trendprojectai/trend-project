@@ -1,8 +1,22 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (text) {
+      setLoading(true);
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 800);
+      return () => clearTimeout(timer);
+    } else {
+      setLoading(false);
+    }
+  }, [text]);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-32 px-16 bg-white dark:bg-black sm:items-start">
@@ -18,7 +32,7 @@ export default function Home() {
           
           <div className="flex flex-col gap-3 w-full max-w-md">
             <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Search Topics
+            🔍 Search Topics
             </label>
             <input
               className="w-full px-4 py-3 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
@@ -30,12 +44,20 @@ export default function Home() {
 
           {text && (
             <div className="flex flex-col gap-3 w-full max-w-md mt-2 p-6 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
-              <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
-                Trend Preview
-              </h2>
-              <p className="text-base leading-7 text-zinc-700 dark:text-zinc-300">
-                Early signals indicate growing interest in <span className="font-medium text-black dark:text-zinc-50">{text}</span>
-              </p>
+              {loading ? (
+                <p className="text-base text-zinc-600 dark:text-zinc-400">
+                  Analyzing trends...
+                </p>
+              ) : (
+                <>
+                  <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
+                    Trend Preview
+                  </h2>
+                  <p className="text-base leading-7 text-zinc-700 dark:text-zinc-300">
+                    Early signals indicate growing interest in <span className="font-medium text-black dark:text-zinc-50">{text}</span>
+                  </p>
+                </>
+              )}
             </div>
           )}
         </div>
