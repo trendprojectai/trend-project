@@ -4,12 +4,20 @@ import { useState, useEffect } from "react";
 export default function Home() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [trendStrength, setTrendStrength] = useState<"Very Very Low" | "Very Low" | "Low" | "Moderate" | "High" | "Very High" | "Exploding" | null>(null);
   const [confidenceScore, setConfidenceScore] = useState<number | null>(null);
   const [trendStatus, setTrendStatus] = useState<"Rising" | "Peaking" | "Declining" | null>(null);
   const [insight, setInsight] = useState<string | null>(null);
   const [shareableInsight, setShareableInsight] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const loggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+      setIsLoggedIn(loggedIn);
+    }
+  }, []);
 
   const insights = [
     "Creators entering early may benefit from lower competition.",
@@ -60,13 +68,31 @@ export default function Home() {
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-32 px-16 bg-white dark:bg-black sm:items-start">
         <div className="flex flex-col items-center gap-8 text-center sm:items-start sm:text-left w-full">
-          <div className="flex flex-col gap-3">
-            <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-              Trend Project
-            </h1>
-            <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-              A universal trend-prediction engine for the internet
-            </p>
+          <div className="flex flex-col gap-3 w-full">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex flex-col gap-3">
+                <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
+          Trend Project
+          </h1>
+          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
+                  A universal trend-prediction engine for the internet
+          </p>
+        </div>
+              <div className="flex gap-3">
+                <a
+                  href="/login"
+                  className="px-4 py-2 text-sm font-medium text-black dark:text-zinc-50 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg border border-zinc-300 dark:border-zinc-700 transition-colors"
+                >
+                  Login
+                </a>
+                <a
+                  href="/pricing"
+                  className="px-4 py-2 text-sm font-medium text-black dark:text-zinc-50 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg border border-zinc-300 dark:border-zinc-700 transition-colors"
+                >
+                  Pricing
+                </a>
+              </div>
+            </div>
           </div>
           
           <div className="flex flex-col gap-3 w-full max-w-md">
@@ -93,57 +119,70 @@ export default function Home() {
                 <>
                   {trendStrength && trendStatus && (
                     <div className="flex flex-col gap-5 w-full max-w-md mt-2">
-                      <div className="flex flex-col gap-4 p-6 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                        <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
-                          Trend Summary
-                        </h2>
-                        <div className="flex flex-col gap-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Topic:</span>
-                            <span className="text-sm font-semibold text-black dark:text-zinc-50">{text}</span>
+                      {!isLoggedIn ? (
+                        <div className="flex flex-col gap-4 p-6 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 opacity-50">
+                          <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
+                            Trend Summary
+                          </h2>
+                          <div className="flex items-center justify-center py-8 border-t border-zinc-200 dark:border-zinc-700">
+                            <p className="text-base text-zinc-600 dark:text-zinc-400">
+                              🔒 Upgrade to unlock full trend analysis
+                            </p>
                           </div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Trend Strength:</span>
-                            <span className="text-sm font-semibold text-black dark:text-zinc-50">{trendStrength}</span>
-                            <span className="text-sm">
-                              {trendStrength === "Very Very Low" && "🔻 🔻 🔻"}
-                              {trendStrength === "Very Low" && "🔻 🔻"}
-                              {trendStrength === "Low" && "🔻"}
-                              {trendStrength === "Moderate" && "🟡"}
-                              {trendStrength === "High" && "🟢"}
-                              {trendStrength === "Very High" && "🟢 🟢"}
-                              {trendStrength === "Exploding" && "🟢 🟢 🟢"}
-                            </span>
-                            {(trendStrength === "Exploding" || trendStrength === "Very High") && (
-                              <span className="text-xs px-2 py-1 bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 rounded border border-orange-200 dark:border-orange-800">
-                                🔥 Spiking
-                              </span>
-                            )}
-                            {(trendStrength === "Very Very Low" || trendStrength === "Very Low") && (
-                              <span className="text-xs px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 rounded border border-blue-200 dark:border-blue-800">
-                                📉 Cooling
-                              </span>
-                            )}
-                          </div>
-                          {confidenceScore !== null && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Confidence:</span>
-                              <span className="text-sm font-semibold text-black dark:text-zinc-50">{confidenceScore}%</span>
-                            </div>
-                          )}
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Trend Status:</span>
-                            <span className="text-sm font-semibold text-black dark:text-zinc-50">{trendStatus}</span>
-                          </div>
-                          <p className="text-sm text-zinc-600 dark:text-zinc-400 italic pt-2 border-t border-zinc-200 dark:border-zinc-700">
-                            {trendStatus === "Rising" && "Early signals show accelerating interest across platforms."}
-                            {trendStatus === "Peaking" && "Interest is high but may be nearing saturation."}
-                            {trendStatus === "Declining" && "Signals suggest interest may be cooling."}
-                          </p>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="flex flex-col gap-4 p-6 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                          <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
+                            Trend Summary
+                          </h2>
+                          <div className="flex flex-col gap-3">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Topic:</span>
+                              <span className="text-sm font-semibold text-black dark:text-zinc-50">{text}</span>
+                            </div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Trend Strength:</span>
+                              <span className="text-sm font-semibold text-black dark:text-zinc-50">{trendStrength}</span>
+                              <span className="text-sm">
+                                {trendStrength === "Very Very Low" && "🔻 🔻 🔻"}
+                                {trendStrength === "Very Low" && "🔻 🔻"}
+                                {trendStrength === "Low" && "🔻"}
+                                {trendStrength === "Moderate" && "🟡"}
+                                {trendStrength === "High" && "🟢"}
+                                {trendStrength === "Very High" && "🟢 🟢"}
+                                {trendStrength === "Exploding" && "🟢 🟢 🟢"}
+                              </span>
+                              {(trendStrength === "Exploding" || trendStrength === "Very High") && (
+                                <span className="text-xs px-2 py-1 bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 rounded border border-orange-200 dark:border-orange-800">
+                                  🔥 Spiking
+                                </span>
+                              )}
+                              {(trendStrength === "Very Very Low" || trendStrength === "Very Low") && (
+                                <span className="text-xs px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 rounded border border-blue-200 dark:border-blue-800">
+                                  📉 Cooling
+                                </span>
+                              )}
+                            </div>
+                            {confidenceScore !== null && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Confidence:</span>
+                                <span className="text-sm font-semibold text-black dark:text-zinc-50">{confidenceScore}%</span>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Trend Status:</span>
+                              <span className="text-sm font-semibold text-black dark:text-zinc-50">{trendStatus}</span>
+                            </div>
+                            <p className="text-sm text-zinc-600 dark:text-zinc-400 italic pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                              {trendStatus === "Rising" && "Early signals show accelerating interest across platforms."}
+                              {trendStatus === "Peaking" && "Interest is high but may be nearing saturation."}
+                              {trendStatus === "Declining" && "Signals suggest interest may be cooling."}
+                            </p>
+                          </div>
+                        </div>
+                      )}
 
-                      {insight && (
+                      {isLoggedIn && insight && (
                         <div className="flex flex-col gap-2 p-5 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
                           <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
                             Why this matters
@@ -154,7 +193,7 @@ export default function Home() {
                         </div>
                       )}
 
-                      {shareableInsight && (
+                      {isLoggedIn && shareableInsight && (
                         <div className="flex flex-col gap-3 p-5 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
                           <h3 className="text-sm font-semibold text-black dark:text-zinc-50">
                             Shareable Insight
